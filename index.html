@@ -2,94 +2,152 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>TextToPDF Pro - Advanced Text to PDF Converter</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
 
-        html, body { overflow-x: hidden; } /* prevent sideways scroll on mobile */
+        html, body { 
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-/*             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-/*             padding: 20px; */
+            line-height: 1.4;
         }
 
         .container {
             max-width: 1600px;
             margin: 0 auto;
             background: white;
-            border-radius: 10px;
+            border-radius: 0;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
             width: 100%;
+            min-height: 100vh;
         }
 
         .header {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
-        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .header p { font-size: 1.1rem; opacity: 0.9; }
+        .header h1 { 
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
 
-        .main-content{display:grid;grid-template-columns:3fr 3fr;min-height:800px}
+        .header p { 
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            opacity: 0.9;
+            font-weight: 300;
+        }
 
-        .text-area-section {padding:25px;background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);border-right:2px solid #cbd5e0}
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 120px);
+        }
 
-        .text-area-label { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; color: #333; }
+        /* Mobile-first approach */
+        .text-area-section {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            order: 1;
+            flex: 1;
+        }
+
+        .text-area-label { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .format-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .format-toolbar button {
+            padding: 10px 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .format-toolbar button:hover,
+        .format-toolbar button:focus {
+            background: #eef6ff;
+            border-color: #4facfe;
+            transform: translateY(-1px);
+        }
+
+        .format-toolbar button:active {
+            transform: translateY(0);
+        }
 
         #textInput {
             width: 100%;
-            height: 500px;
-            padding: 20px;
+            height: 300px;
+            padding: 16px;
             border: 2px solid #e1e5e9;
             border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 16px;
+            line-height: 1.6;
             resize: vertical;
             font-family: 'Georgia', serif;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            background: white;
         }
 
         #textInput:focus {
             outline: none;
             border-color: #4facfe;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.15);
         }
-        .format-toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .format-toolbar button {
-      padding: 6px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: #f9f9f9;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s ease;
-    }
-    .format-toolbar button:hover {
-      background: #eef6ff;
-      border-color: #4facfe;
-    }
 
         .controls-panel {
-            padding:40px;background:linear-gradient(135deg,#fff 0%,#f7fafc 100%);
+            padding: 20px;
+            background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+            order: 2;
+            border-top: 1px solid #e2e8f0;
         }
 
         .preview-panel {
             background: #f8f9fa;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            margin-top: 30px;
-            overflow: hidden; /* keep children from overflowing */
+            padding: 16px;
+            margin-top: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            order: 3;
         }
 
         .preview-panel.hidden { display: none; }
@@ -98,29 +156,37 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
-        .preview-title { font-weight: 600; color: #333; font-size: 0.9rem; }
-        .preview-status { font-size: 0.75rem; color: #666; background: #e8f4fd; padding: 4px 8px; border-radius: 4px; }
+        .preview-title { 
+            font-weight: 600; 
+            color: #333; 
+            font-size: 1rem;
+        }
 
-        /* --- PREVIEW CONTAINERS --- */
+        .preview-status { 
+            font-size: 0.8rem; 
+            color: #666; 
+            background: #e8f4fd; 
+            padding: 6px 12px; 
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
         #previewFrame {
             width: 100%;
-            height: auto;
-            min-height: 300px;
-            max-height: 70vh;
+            height: 400px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
             background: #fafafa;
         }
 
-        /* PDF.js viewer container for mobile */
         #pdfJsViewer {
             display: none;
             width: 100%;
             min-height: 300px;
-            max-height: 70vh;
+            max-height: 500px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
             background: #fafafa;
@@ -128,11 +194,11 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Ensure the PDF canvas never overflows horizontally */
         #pdfJsViewer canvas {
             width: 100% !important;
             height: auto !important;
             display: block;
+            border-radius: 4px;
         }
 
         .preview-loading {
@@ -143,97 +209,456 @@
             color: #666;
             font-style: italic;
             text-align: center;
+            font-size: 0.95rem;
         }
 
         .control-section {
-            margin-bottom: 25px;
-            padding: 15px;
+            margin-bottom: 20px;
+            padding: 16px;
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #e1e5e9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .control-section h3 { font-size: 0.9rem; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .control-section h3 { 
+            font-size: 1rem; 
+            font-weight: 600; 
+            color: #333; 
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        .control-group { margin-bottom: 15px; }
-        .control-group:last-child { margin-bottom: 0; }
+        .control-group { 
+            margin-bottom: 16px; 
+        }
+
+        .control-group:last-child { 
+            margin-bottom: 0; 
+        }
 
         .control-group label {
             display: block;
             font-weight: 500;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: #555;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
         .control-group select,
         .control-group input[type="text"],
         .control-group input[type="number"] {
             width: 100%;
-            padding: 8px 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 16px;
             background: white;
+            transition: all 0.2s ease;
         }
 
-        .range-group { display: flex; align-items: center; gap: 10px; }
-        .range-group input[type="range"] { flex: 1; }
-        .range-value { min-width: 35px; font-weight: 600; color: #4facfe; font-size: 0.85rem; }
+        .control-group select:focus,
+        .control-group input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.1);
+            outline: none;
+        }
+
+        .range-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+
+        .range-group input[type="range"] { 
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+        }
+
+        .range-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4facfe;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .range-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4facfe;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .range-value { 
+            min-width: 50px; 
+            font-weight: 600; 
+            color: #4facfe; 
+            font-size: 0.9rem;
+            text-align: center;
+            background: #eef6ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
 
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 16px;
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #e1e5e9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .stat { text-align: center; }
-        .stat-number { font-size: 1.2rem; font-weight: 700; color: #4facfe; }
-        .stat-label { font-size: 0.75rem; color: #666; margin-top: 3px; }
+        .stat { 
+            text-align: center;
+            padding: 8px;
+        }
+
+        .stat-number { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: #4facfe;
+            display: block;
+        }
+
+        .stat-label { 
+            font-size: 0.8rem; 
+            color: #666; 
+            margin-top: 4px;
+            font-weight: 500;
+        }
 
         .generate-btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
             margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            touch-action: manipulation;
+            min-height: 56px;
         }
 
-        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(238, 90, 36, 0.3); }
-        .generate-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-
-        .status-info { background: #e8f4fd; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 11px; }
-        .status-info h4 { color: #0066cc; margin-bottom: 6px; font-size: 0.8rem; }
-        #statusOutput { color: #0066cc; font-family: monospace; font-size: 11px; }
-
-        .checkbox-option { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .checkbox-option input[type="checkbox"] { width: auto; }
-        .checkbox-option label { margin-bottom: 0; font-size: 0.8rem; }
-
-        .preview-settings { background: #f0f8ff; padding: 10px; border-radius: 6px; font-size: 11px; color: #2c5282; margin-top: 10px; }
-
-        @media (max-width: 1200px) {
-            .main-content { grid-template-columns: 1fr 300px; }
+        .generate-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(238, 90, 36, 0.4); 
         }
 
-        @media (max-width: 768px) {
-            .main-content { grid-template-columns: 1fr; }
-            .header h1 { font-size: 2rem; }
-            #textInput { height: 350px; }
-            .controls-panel { border-left: none; border-top: 1px solid #e1e5e9; }
-            .preview-panel { border-top: 1px solid #e1e5e9; }
-            #previewFrame, #pdfJsViewer { min-height: 300px; max-height: 60vh; }
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled { 
+            background: #cbd5e0; 
+            cursor: not-allowed; 
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-info { 
+            background: #e8f4fd; 
+            padding: 16px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            font-size: 0.85rem;
+            border-left: 4px solid #4facfe;
+        }
+
+        .status-info h4 { 
+            color: #0066cc; 
+            margin-bottom: 8px; 
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        #statusOutput { 
+            color: #0066cc; 
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; 
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .checkbox-option { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .checkbox-option input[type="checkbox"] { 
+            width: 20px;
+            height: 20px;
+            accent-color: #4facfe;
+            cursor: pointer;
+        }
+
+        .checkbox-option label { 
+            margin-bottom: 0; 
+            font-size: 0.9rem;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .preview-settings { 
+            background: #f0f8ff; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-size: 0.8rem; 
+            color: #2c5282; 
+            margin-top: 16px;
+            border-left: 3px solid #4facfe;
+            line-height: 1.4;
+        }
+
+        /* Tablet styles */
+        @media (min-width: 768px) {
+            .container {
+                border-radius: 20px;
+                margin: 20px auto;
+                min-height: calc(100vh - 40px);
+            }
+
+            .main-content {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                grid-template-rows: auto auto;
+                min-height: 800px;
+            }
+
+            .text-area-section {
+                grid-row: 1 / 3;
+                order: 1;
+                border-right: 2px solid #cbd5e0;
+                border-top: none;
+                padding: 30px;
+            }
+
+            .controls-panel {
+                order: 2;
+                border-top: none;
+                padding: 30px;
+            }
+
+            .preview-panel {
+                order: 3;
+                margin-top: 0;
+                margin-left: -20px;
+                margin-right: -20px;
+                border-radius: 0;
+                border: none;
+                border-top: 1px solid #e2e8f0;
+                padding: 20px 30px;
+            }
+
+            #textInput {
+                height: 500px;
+                font-size: 15px;
+            }
+
+            .header {
+                padding: 30px;
+                position: static;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+            .main-content {
+                grid-template-columns: 3fr 2fr;
+            }
+
+            .text-area-section {
+                padding: 40px;
+            }
+
+            .controls-panel {
+                padding: 40px;
+            }
+
+            .preview-panel {
+                padding: 20px 40px;
+            }
+
+            #textInput {
+                height: 600px;
+                font-size: 14px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .format-toolbar button:hover {
+                transform: translateY(-2px);
+            }
+        }
+
+        /* Large desktop */
+        @media (min-width: 1200px) {
+            .main-content {
+                grid-template-columns: 3fr 3fr;
+            }
+        }
+
+        /* Mobile landscape fix */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 4px;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            #textInput {
+                height: 200px;
+            }
+
+            .preview-panel {
+                margin-top: 15px;
+            }
+
+            #previewFrame, #pdfJsViewer {
+                height: 250px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            body {
+                -webkit-font-smoothing: subpixel-antialiased;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .container {
+                background: #1a202c;
+                color: #e2e8f0;
+            }
+
+            .text-area-section {
+                background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            }
+
+            .controls-panel {
+                background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            }
+
+            .control-section {
+                background: #2d3748;
+                border-color: #4a5568;
+            }
+
+            .stats {
+                background: #2d3748;
+                border-color: #4a5568;
+            }
+
+            #textInput {
+                background: #2d3748;
+                color: #e2e8f0;
+                border-color: #4a5568;
+            }
+
+            .control-group select,
+            .control-group input[type="text"],
+            .control-group input[type="number"] {
+                background: #2d3748;
+                color: #e2e8f0;
+                border-color: #4a5568;
+            }
+
+            .format-toolbar button {
+                background: #4a5568;
+                color: #e2e8f0;
+                border-color: #718096;
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for keyboard navigation */
+        button:focus,
+        select:focus,
+        input:focus,
+        textarea:focus {
+            outline: 2px solid #4facfe;
+            outline-offset: 2px;
+        }
+
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: loading-shimmer 1.5s infinite;
+        }
+
+        @keyframes loading-shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Mobile pull-to-refresh prevention */
+        body {
+            overscroll-behavior: contain;
+        }
+
+        /* Safe area handling for notched devices */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            
+            .container {
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
         }
     </style>
 </head>
@@ -246,12 +671,11 @@
         
         <div class="main-content">
             <div class="text-area-section">
-                <div class="text-area-label">Enter your text content</div>
-                 <!-- New Formatting Toolbar -->
+                
                 <div class="format-toolbar">
-                   <button type="button" onclick="applyFormatting('bold')"><b>B</b></button>
-                   <button type="button" onclick="applyFormatting('italic')"><i>I</i></button>
-                    <button type="button" onclick="applyFormatting('underline')"><u>U</u></button>
+                    <button type="button" onclick="applyFormatting('bold')" title="Bold"><b>B</b></button>
+                    <button type="button" onclick="applyFormatting('italic')" title="Italic"><i>I</i></button>
+                    <button type="button" onclick="applyFormatting('underline')" title="Underline"><u>U</u></button>
                 </div>
                 <textarea id="textInput" placeholder="Paste or type your text here...
 
@@ -262,17 +686,17 @@ Example content:
 • Academic papers
 • Any text content
 
-This converter automatically formats your text and provides live preview."></textarea>
+This converter automatically formats your text and provides live preview." aria-label="Text input for PDF generation"></textarea>
+                
                 <div class="preview-panel" id="previewPanel">
                     <div class="preview-header">
-                        <div class="preview-title">Live Preview</div>
+                        <div class="preview-title">📄 Live Preview</div>
                         <div class="preview-status" id="previewStatus">Ready</div>
                     </div>
                     <div class="preview-loading" id="previewLoading">
                         Enter text to see preview...
                     </div>
-                    <iframe id="previewFrame" style="width:100%; min-height:500px; border:2px solid #e1e5e9; border-radius:8px; display:none;"></iframe>
-                    <!-- NEW: inline PDF.js container for mobile -->
+                    <iframe id="previewFrame" style="display:none;" aria-label="PDF preview frame"></iframe>
                     <div id="pdfJsViewer" aria-label="PDF preview"></div>
                 </div>
             </div>
@@ -290,14 +714,14 @@ This converter automatically formats your text and provides live preview."></tex
                 </div>
 
                 <div class="status-info">
-                    <h4>System Status</h4>
+                    <h4>⚙️ System Status</h4>
                     <div id="statusOutput">Initializing PDF engine...</div>
                 </div>
 
                 <div class="control-section">
-                    <h3>Document Info</h3>
+                    <h3>📋 Document Info</h3>
                     <div class="control-group">
-                        <label>Document Type</label>
+                        <label for="documentType">Document Type</label>
                         <select id="documentType">
                             <option value="general">General Document</option>
                             <option value="report">Business Report</option>
@@ -309,19 +733,19 @@ This converter automatically formats your text and provides live preview."></tex
                         </select>
                     </div>
                     <div class="control-group">
-                        <label>Document Title</label>
+                        <label for="docTitle">Document Title</label>
                         <input type="text" id="docTitle" placeholder="Optional document title">
                     </div>
                     <div class="control-group">
-                        <label>Author Name</label>
+                        <label for="authorName">Author Name</label>
                         <input type="text" id="authorName" placeholder="Optional author name">
                     </div>
                 </div>
 
                 <div class="control-section">
-                    <h3>Typography</h3>
+                    <h3>✒️ Typography</h3>
                     <div class="control-group">
-                        <label>Font Family</label>
+                        <label for="fontFamily">Font Family</label>
                         <select id="fontFamily">
                             <option value="helvetica">Helvetica</option>
                             <option value="times" selected>Times New Roman</option>
@@ -342,10 +766,12 @@ This converter automatically formats your text and provides live preview."></tex
                     </div>
                     <div class="control-group">
                         <label>Font Size: <span class="range-value" id="fontSizeValue">12pt</span></label>
-                        <input type="range" id="fontSize" min="8" max="24" value="12" step="1">
+                        <div class="range-group">
+                            <input type="range" id="fontSize" min="8" max="24" value="12" step="1">
+                        </div>
                     </div>
                     <div class="control-group">
-                        <label>Text Alignment</label>
+                        <label for="textAlignment">Text Alignment</label>
                         <select id="textAlignment">
                             <option value="left" selected>Left Aligned</option>
                             <option value="center">Center Aligned</option>
@@ -356,21 +782,25 @@ This converter automatically formats your text and provides live preview."></tex
                 </div>
 
                 <div class="control-section">
-                    <h3>Spacing</h3>
+                    <h3>📏 Spacing</h3>
                     <div class="control-group">
                         <label>Line Spacing: <span class="range-value" id="lineSpacingValue">1.0x</span></label>
-                        <input type="range" id="lineSpacing" min="0.8" max="3.0" value="1.0" step="0.1">
+                        <div class="range-group">
+                            <input type="range" id="lineSpacing" min="0.8" max="3.0" value="1.0" step="0.1">
+                        </div>
                     </div>
                     <div class="control-group">
                         <label>Paragraph Spacing: <span class="range-value" id="paragraphSpacingValue">1.0x</span></label>
-                        <input type="range" id="paragraphSpacing" min="0" max="3.0" value="1.0" step="0.1">
+                        <div class="range-group">
+                            <input type="range" id="paragraphSpacing" min="0" max="3.0" value="1.0" step="0.1">
+                        </div>
                     </div>
                 </div>
 
                 <div class="control-section">
-                    <h3>Page Layout</h3>
+                    <h3>📄 Page Layout</h3>
                     <div class="control-group">
-                        <label>Page Size</label>
+                        <label for="pageSize">Page Size</label>
                         <select id="pageSize">
                             <option value="a4" selected>A4</option>
                             <option value="letter">Letter</option>
@@ -379,20 +809,26 @@ This converter automatically formats your text and provides live preview."></tex
                     </div>
                     <div class="control-group">
                         <label>Top Margin: <span class="range-value" id="topMarginValue">20mm</span></label>
-                        <input type="range" id="topMargin" min="10" max="50" value="20" step="1">
+                        <div class="range-group">
+                            <input type="range" id="topMargin" min="10" max="50" value="20" step="1">
+                        </div>
                     </div>
                     <div class="control-group">
                         <label>Side Margins: <span class="range-value" id="sideMarginValue">20mm</span></label>
-                        <input type="range" id="sideMargin" min="10" max="50" value="20" step="1">
+                        <div class="range-group">
+                            <input type="range" id="sideMargin" min="10" max="50" value="20" step="1">
+                        </div>
                     </div>
                     <div class="control-group">
                         <label>Bottom Margin: <span class="range-value" id="bottomMarginValue">20mm</span></label>
-                        <input type="range" id="bottomMargin" min="10" max="50" value="20" step="1">
+                        <div class="range-group">
+                            <input type="range" id="bottomMargin" min="10" max="50" value="20" step="1">
+                        </div>
                     </div>
                 </div>
 
                 <div class="control-section">
-                    <h3>Options</h3>
+                    <h3>⚙️ Options</h3>
                     <div class="checkbox-option">
                         <input type="checkbox" id="addPageNumbers" checked>
                         <label for="addPageNumbers">Add page numbers</label>
@@ -413,10 +849,10 @@ This converter automatically formats your text and provides live preview."></tex
                         <input type="checkbox" id="enableLivePreview" checked>
                         <label for="enableLivePreview">Enable live preview</label>
                     </div>
-                     <div class="checkbox-option">
+                    <div class="checkbox-option">
                         <input type="checkbox" id="forceMobilePreview" onchange="forceMobileView=this.checked; schedulePreviewUpdate();">
                         <label for="forceMobilePreview">Force mobile preview</label>
-                     </div>
+                    </div>
                 </div>
 
                 <div class="preview-settings" id="previewSettings">
@@ -424,7 +860,7 @@ This converter automatically formats your text and provides live preview."></tex
                 </div>
 
                 <button class="generate-btn" id="generateBtn">
-                    Generate Professional PDF
+                    🚀 Generate Professional PDF
                 </button>
             </div>
         </div>
@@ -443,6 +879,7 @@ This converter automatically formats your text and provides live preview."></tex
         let previewUpdateTimeout = null;
         let currentPreviewBlob = null;
         let pdfResizeTimeout = null;
+        let forceMobileView = false;
 
         // DOM elements
         const textInput = document.getElementById('textInput');
@@ -464,20 +901,22 @@ This converter automatically formats your text and provides live preview."></tex
             sideMargin: { input: document.getElementById('sideMargin'), display: document.getElementById('sideMarginValue'), suffix: 'mm' },
             bottomMargin: { input: document.getElementById('bottomMargin'), display: document.getElementById('bottomMarginValue'), suffix: 'mm' }
         };
-         function applyFormatting(type) {
+
+        function applyFormatting(type) {
             const start = textInput.selectionStart;
             const end = textInput.selectionEnd;
             const selectedText = textInput.value.substring(start, end);
 
-             let formatted = selectedText;
-             if (type === 'bold') formatted = `**${selectedText}**`;
-             if (type === 'italic') formatted = `_${selectedText}_`;
-             if (type === 'underline') formatted = `__${selectedText}__`;
+            let formatted = selectedText;
+            if (type === 'bold') formatted = `**${selectedText}**`;
+            if (type === 'italic') formatted = `_${selectedText}_`;
+            if (type === 'underline') formatted = `__${selectedText}__`;
 
-             // Replace selected text
-             textInput.setRangeText(formatted, start, end, 'end');
-             textInput.focus();
-         }
+            // Replace selected text
+            textInput.setRangeText(formatted, start, end, 'end');
+            textInput.focus();
+        }
+
         function initializeRanges() {
             Object.keys(rangeInputs).forEach(key => {
                 const range = rangeInputs[key];
@@ -726,44 +1165,62 @@ This converter automatically formats your text and provides live preview."></tex
             if (!document.getElementById('enableLivePreview').checked) return;
             clearTimeout(previewUpdateTimeout);
             previewStatus.textContent = 'Updating...';
-            previewUpdateTimeout = setTimeout(function() { updatePreview(); }, 500);
+            previewStatus.classList.add('loading');
+            previewUpdateTimeout = setTimeout(function() { 
+                updatePreview(); 
+                previewStatus.classList.remove('loading');
+            }, 500);
         }
 
         function togglePreviewPanel() {
             const isEnabled = document.getElementById('enableLivePreview').checked;
-            if (isEnabled) { previewPanel.classList.remove('hidden'); schedulePreviewUpdate(); }
-            else { previewPanel.classList.add('hidden'); }
+            if (isEnabled) { 
+                previewPanel.classList.remove('hidden'); 
+                schedulePreviewUpdate(); 
+            } else { 
+                previewPanel.classList.add('hidden'); 
+            }
         }
 
-        /* -------- Mobile helpers -------- */
-        // function isMobile() {
-        //     return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-        // }
-         let forceMobileView = false;
-
-         function isMobile() {
+        // Enhanced mobile detection with better desktop view handling
+        function isMobile() {
             if (forceMobileView) return true;
-            return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent);
-         }
-
+            
+            // Check for actual mobile user agents
+            const mobileUA = /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent);
+            
+            // Check screen size as backup (handles desktop view on mobile)
+            const smallScreen = window.innerWidth < 768 || window.screen.width < 768;
+            
+            // Check for touch capability
+            const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            return mobileUA && (smallScreen || hasTouch);
+        }
 
         async function renderPdfWithPdfJs(blobUrl) {
             const container = document.getElementById('pdfJsViewer');
             if (!window.pdfjsLib || !container) return;
 
-            container.innerHTML = '';
+            container.innerHTML = '<div class="preview-loading">Loading PDF...</div>';
+            
             try {
                 const loadingTask = pdfjsLib.getDocument(blobUrl);
                 const pdf = await loadingTask.promise;
+                
+                container.innerHTML = '';
 
-                // Render all pages to the container, each scaled to fit width
+                // Calculate optimal scale based on container width
+                const containerWidth = Math.max(container.clientWidth, container.offsetWidth, 300);
+                
+                // Render all pages
                 for (let p = 1; p <= pdf.numPages; p++) {
                     const page = await pdf.getPage(p);
                     const baseViewport = page.getViewport({ scale: 1 });
-                    // Fit page width to container width
-                    const containerWidth = container.clientWidth || container.offsetWidth || window.innerWidth;
-                    const scale = Math.max(0.1, Math.min(containerWidth / baseViewport.width, 2)); // clamp
-                    const viewport = page.getViewport({ scale });
+                    
+                    // Scale to fit container width with some padding
+                    const scale = Math.min((containerWidth - 20) / baseViewport.width, 2);
+                    const viewport = page.getViewport({ scale: Math.max(scale, 0.5) });
 
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d', { alpha: false });
@@ -773,26 +1230,40 @@ This converter automatically formats your text and provides live preview."></tex
                     canvas.style.width = '100%';
                     canvas.style.height = 'auto';
                     canvas.style.display = 'block';
-                    canvas.style.margin = p === 1 ? '0' : '12px 0 0 0';
+                    canvas.style.maxWidth = '100%';
+                    
+                    if (p > 1) {
+                        canvas.style.marginTop = '12px';
+                        canvas.style.borderTop = '1px solid #e2e8f0';
+                        canvas.style.paddingTop = '12px';
+                    }
 
                     container.appendChild(canvas);
                     await page.render({ canvasContext: context, viewport }).promise;
                 }
 
-                // Re-render on resize (debounced)
-                window.addEventListener('resize', () => {
-                    if (document.getElementById('pdfJsViewer').style.display !== 'none') {
-                        clearTimeout(pdfResizeTimeout);
-                        pdfResizeTimeout = setTimeout(() => renderPdfWithPdfJs(currentPreviewBlob), 200);
-                    }
-                });
+                // Improved resize handling with debouncing
+                const handleResize = () => {
+                    clearTimeout(pdfResizeTimeout);
+                    pdfResizeTimeout = setTimeout(() => {
+                        if (container.style.display !== 'none' && currentPreviewBlob) {
+                            renderPdfWithPdfJs(currentPreviewBlob);
+                        }
+                    }, 300);
+                };
+
+                // Remove existing listeners to prevent duplicates
+                window.removeEventListener('resize', handleResize);
+                window.addEventListener('resize', handleResize);
+                window.removeEventListener('orientationchange', handleResize);
+                window.addEventListener('orientationchange', handleResize);
+
             } catch (e) {
                 console.error('PDF.js render error:', e);
-                container.innerHTML = '<div class="preview-loading">Preview error</div>';
+                container.innerHTML = '<div class="preview-loading">Preview error: Unable to render PDF</div>';
             }
         }
 
-        // Update live preview
         function updatePreview() {
             const text = textInput.value.trim();
             if (!text || !document.getElementById('enableLivePreview').checked) {
@@ -809,22 +1280,24 @@ This converter automatically formats your text and provides live preview."></tex
                 const doc = createPDFDocument(text, settings);
                 const pdfBlob = doc.output('blob');
 
-                if (currentPreviewBlob) URL.revokeObjectURL(currentPreviewBlob);
+                if (currentPreviewBlob) {
+                    URL.revokeObjectURL(currentPreviewBlob);
+                }
                 const blobUrl = URL.createObjectURL(pdfBlob);
                 currentPreviewBlob = blobUrl;
 
+                previewLoading.style.display = 'none';
+
                 if (isMobile()) {
                     previewFrame.style.display = 'none';
-                    const v = document.getElementById('pdfJsViewer');
-                    v.style.display = 'block';
-                    previewLoading.style.display = 'none';
+                    const pdfViewer = document.getElementById('pdfJsViewer');
+                    pdfViewer.style.display = 'block';
                     previewStatus.textContent = 'Updated';
                     renderPdfWithPdfJs(blobUrl);
                 } else {
                     document.getElementById('pdfJsViewer').style.display = 'none';
                     previewFrame.src = blobUrl;
                     previewFrame.style.display = 'block';
-                    previewLoading.style.display = 'none';
                     previewStatus.textContent = 'Updated';
                 }
             } catch (error) {
@@ -832,17 +1305,21 @@ This converter automatically formats your text and provides live preview."></tex
                 previewFrame.style.display = 'none';
                 document.getElementById('pdfJsViewer').style.display = 'none';
                 previewLoading.style.display = 'flex';
-                previewLoading.textContent = 'Preview error: ' + error.message;
+                previewLoading.textContent = 'Preview error: ' + (error.message || 'Unknown error');
                 previewStatus.textContent = 'Error';
             }
         }
 
         function generatePDF() {
             const text = textInput.value.trim();
-            if (!text) { alert('Please enter some text before generating PDF!'); return; }
+            if (!text) { 
+                alert('Please enter some text before generating PDF!'); 
+                return; 
+            }
 
             generateBtn.textContent = 'Generating PDF...';
             generateBtn.disabled = true;
+            generateBtn.classList.add('loading');
             statusOutput.textContent = 'Processing text and creating PDF...';
 
             try {
@@ -855,27 +1332,33 @@ This converter automatically formats your text and provides live preview."></tex
 
                 doc.save(filename);
 
-                statusOutput.textContent = 'PDF generated successfully!';
-                generateBtn.textContent = 'PDF Created!';
+                statusOutput.textContent = 'PDF generated successfully! Download should start automatically.';
+                generateBtn.textContent = 'PDF Created Successfully!';
                 generateBtn.style.background = 'linear-gradient(135deg, #00b894, #00a085)';
                 
                 setTimeout(function() {
                     generateBtn.textContent = 'Generate Professional PDF';
                     generateBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a24)';
                     generateBtn.disabled = false;
+                    generateBtn.classList.remove('loading');
                 }, 3000);
 
             } catch (error) {
                 console.error('PDF generation error:', error);
-                statusOutput.textContent = 'Error: ' + error.message;
+                statusOutput.textContent = 'Error generating PDF: ' + (error.message || 'Unknown error');
                 alert('Error generating PDF: ' + error.message);
                 generateBtn.textContent = 'Generate Professional PDF';
                 generateBtn.disabled = false;
+                generateBtn.classList.remove('loading');
             }
         }
 
         function setupEventListeners() {
-            textInput.addEventListener('input', function() { updateStats(); schedulePreviewUpdate(); });
+            // Text input events
+            textInput.addEventListener('input', function() { 
+                updateStats(); 
+                schedulePreviewUpdate(); 
+            });
 
             textInput.addEventListener('paste', function() {
                 setTimeout(function() {
@@ -889,14 +1372,67 @@ This converter automatically formats your text and provides live preview."></tex
                 }, 10);
             });
 
-            const controls = ['fontFamily', 'textAlignment', 'pageSize', 'docTitle', 'authorName', 'documentType', 'addPageNumbers', 'preserveLineBreaks', 'addDateStamp', 'includeSummary'];
+            // Control events
+            const controls = [
+                'fontFamily', 'textAlignment', 'pageSize', 'docTitle', 
+                'authorName', 'documentType', 'addPageNumbers', 
+                'preserveLineBreaks', 'addDateStamp', 'includeSummary'
+            ];
+            
             controls.forEach(function(id) {
                 const element = document.getElementById(id);
-                if (element) element.addEventListener('change', function() { updatePreviewSettings(); schedulePreviewUpdate(); });
+                if (element) {
+                    element.addEventListener('change', function() { 
+                        updatePreviewSettings(); 
+                        schedulePreviewUpdate(); 
+                    });
+                }
             });
 
+            // Preview toggle
             document.getElementById('enableLivePreview').addEventListener('change', togglePreviewPanel);
+            
+            // Generate button
             generateBtn.addEventListener('click', generatePDF);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 's':
+                            e.preventDefault();
+                            if (!generateBtn.disabled) generatePDF();
+                            break;
+                        case 'b':
+                            if (document.activeElement === textInput) {
+                                e.preventDefault();
+                                applyFormatting('bold');
+                            }
+                            break;
+                        case 'i':
+                            if (document.activeElement === textInput) {
+                                e.preventDefault();
+                                applyFormatting('italic');
+                            }
+                            break;
+                        case 'u':
+                            if (document.activeElement === textInput) {
+                                e.preventDefault();
+                                applyFormatting('underline');
+                            }
+                            break;
+                    }
+                }
+            });
+
+            // Handle orientation change on mobile
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    if (currentPreviewBlob && isMobile()) {
+                        renderPdfWithPdfJs(currentPreviewBlob);
+                    }
+                }, 300);
+            });
         }
 
         function initialize() {
@@ -905,16 +1441,47 @@ This converter automatically formats your text and provides live preview."></tex
             updateStats();
             updatePreviewSettings();
 
+            // Enhanced initialization with better error handling
             setTimeout(function() {
-                if (typeof window.jspdf !== 'undefined') {
-                    statusOutput.textContent = 'PDF engine ready';
-                    if (textInput.value.trim()) schedulePreviewUpdate();
-                } else {
-                    statusOutput.textContent = 'PDF engine failed to load';
+                try {
+                    if (typeof window.jspdf !== 'undefined') {
+                        statusOutput.textContent = 'PDF engine ready - You can start typing!';
+                        if (textInput.value.trim()) {
+                            schedulePreviewUpdate();
+                        }
+                    } else {
+                        statusOutput.textContent = 'PDF engine failed to load - Please refresh the page';
+                        console.error('jsPDF failed to load');
+                    }
+                } catch (error) {
+                    statusOutput.textContent = 'Initialization error: ' + error.message;
+                    console.error('Initialization error:', error);
                 }
             }, 1000);
+
+            // Add sample text for demo purposes (optional)
+            if (!textInput.value.trim()) {
+                textInput.placeholder = `Start typing your document here...
+
+Tips:
+• Use **bold**, _italic_, or __underline__ formatting
+• Paste content from other sources
+• Adjust settings in the control panel
+• Preview updates automatically
+• Press Ctrl+S (Cmd+S on Mac) to generate PDF
+
+Your document will be professionally formatted with your chosen settings.`;
+            }
         }
 
+        // Cleanup function for blob URLs
+        window.addEventListener('beforeunload', function() {
+            if (currentPreviewBlob) {
+                URL.revokeObjectURL(currentPreviewBlob);
+            }
+        });
+
+        // Initialize the application
         initialize();
     </script>
 </body>
