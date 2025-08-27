@@ -22,6 +22,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             line-height: 1.4;
+            overscroll-behavior: contain; /* pull-to-refresh prevention */
         }
 
         .container {
@@ -58,18 +59,23 @@
             font-weight: 300;
         }
 
+        /* ---------- LAYOUT (mobile-first) ---------- */
         .main-content {
             display: flex;
             flex-direction: column;
+            /* allow wrapping at all sizes; prevents breakage in forced desktop mode */
+            flex-wrap: wrap;
             min-height: calc(100vh - 120px);
         }
+        /* prevent flex children from overflowing */
+        .main-content > * { min-width: 0; }
 
-        /* Mobile-first approach */
         .text-area-section {
             padding: 20px;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             order: 1;
-            flex: 1;
+            flex: 1 1 100%;
+            min-width: 280px;
         }
 
         .text-area-label { 
@@ -139,6 +145,8 @@
             background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
             order: 2;
             border-top: 1px solid #e2e8f0;
+            flex: 1 1 100%;
+            min-width: 260px;
         }
 
         .preview-panel {
@@ -434,7 +442,7 @@
             line-height: 1.4;
         }
 
-        /* Tablet styles */
+        /* ---------- Tablet styles (now FLEX with WRAP) ---------- */
         @media (min-width: 768px) {
             .container {
                 border-radius: 20px;
@@ -443,15 +451,18 @@
             }
 
             .main-content {
-                display: grid;
-                grid-template-columns: 2fr 1fr;
-                grid-template-rows: auto auto;
+                /* Switch to row layout, keep wrap ON so small “desktop-mode” screens don’t break */
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: stretch;
                 min-height: 800px;
             }
 
             .text-area-section {
-                grid-row: 1 / 3;
                 order: 1;
+                /* allow to take more space, but drop below when narrow */
+                flex: 2 1 520px;
+                min-width: 320px;
                 border-right: 2px solid #cbd5e0;
                 border-top: none;
                 padding: 30px;
@@ -459,18 +470,18 @@
 
             .controls-panel {
                 order: 2;
+                flex: 1 1 360px;
+                min-width: 300px;
                 border-top: none;
                 padding: 30px;
             }
 
             .preview-panel {
                 order: 3;
-                margin-top: 0;
-                margin-left: -20px;
-                margin-right: -20px;
-                border-radius: 0;
-                border: none;
-                border-top: 1px solid #e2e8f0;
+                margin-top: 20px;
+                /* remove negative margins that could cause overflow in forced desktop view */
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
                 padding: 20px 30px;
             }
 
@@ -485,18 +496,21 @@
             }
         }
 
-        /* Desktop styles */
+        /* ---------- Desktop styles ---------- */
         @media (min-width: 1024px) {
             .main-content {
-                grid-template-columns: 3fr 2fr;
+                /* on real desktops, no wrap is usually fine, but keeping wrap is safer */
+                flex-wrap: nowrap;
             }
 
             .text-area-section {
                 padding: 40px;
+                flex: 3 1 640px;
             }
 
             .controls-panel {
                 padding: 40px;
+                flex: 2 1 420px;
             }
 
             .preview-panel {
@@ -517,14 +531,14 @@
             }
         }
 
-        /* Large desktop */
+        /* ---------- Large desktop ---------- */
         @media (min-width: 1200px) {
             .main-content {
-                grid-template-columns: 3fr 3fr;
+                /* still flex; the flex-basis above scales naturally */
             }
         }
 
-        /* Mobile landscape fix */
+        /* ---------- Mobile landscape fix ---------- */
         @media (max-height: 500px) and (orientation: landscape) {
             .header {
                 padding: 15px 20px;
@@ -559,7 +573,6 @@
             }
         }
 
-       
         /* Accessibility improvements */
         @media (prefers-reduced-motion: reduce) {
             * {
@@ -598,11 +611,6 @@
         @keyframes loading-shimmer {
             0% { left: -100%; }
             100% { left: 100%; }
-        }
-
-        /* Mobile pull-to-refresh prevention */
-        body {
-            overscroll-behavior: contain;
         }
 
         /* Safe area handling for notched devices */
@@ -896,7 +904,7 @@ This converter automatically formats your text and provides live preview." aria-
         function simpleSummary(text, sentenceCount = 3) {
             let cleanText = text.replace(/#{3,}/g, '').replace(/-{3,}/g, '');
             cleanText = cleanText.trim().replace(/\s+/g, ' ');
-            const sentences = cleanText.match(/[^\.!\?]+[\.!\?]+/g);
+            const sentences = cleanText.match(/[^\\.\\!\\?]+[\\.\\!\\?]+/g);
             if (!sentences || sentences.length === 0) return '';
             const summarySentences = sentences
                 .slice(0, Math.min(sentenceCount, sentences.length))
@@ -908,21 +916,21 @@ This converter automatically formats your text and provides live preview." aria-
         function mmToPt(mm) { return mm * 2.834645669; }
 
         function preprocessText(text, preserveLineBreaks = true) {
-            text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            text = text.replace(/\\r\\n/g, '\\n').replace(/\\r/g, '\\n');
             text = text.replace(/#{3,}/g, '');
             text = text.replace(/-{3,}/g, '');
-            if (preserveLineBreaks) { text = text.replace(/\n{3,}/g, '\n\n'); }
-            else { text = text.replace(/([^\n])\n([^\n])/g, '$1 $2'); }
-            text = text.replace(/\t/g, '    ').replace(/ +/g, ' ').replace(/ +$/gm, '');
+            if (preserveLineBreaks) { text = text.replace(/\\n{3,}/g, '\\n\\n'); }
+            else { text = text.replace(/([^\\n])\\n([^\\n])/g, '$1 $2'); }
+            text = text.replace(/\\t/g, '    ').replace(/ +/g, ' ').replace(/ +$/gm, '');
             return text.trim();
         }
 
         function splitIntoParagraphs(text) {
-            return text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+            return text.split(/\\n\\s*\\n/).filter(p => p.trim().length > 0);
         }
 
         function addJustifiedText(doc, text, x, y, maxWidth, fontSize) {
-            const words = text.trim().split(/\s+/);
+            const words = text.trim().split(/\\s+/);
             if (words.length <= 1) { doc.text(text, x, y); return; }
             const totalTextWidth = words.reduce((sum, w) => sum + doc.getTextWidth(w), 0);
             const totalSpaceWidth = maxWidth - totalTextWidth;
@@ -1029,17 +1037,17 @@ This converter automatically formats your text and provides live preview." aria-
                         }
                         const trimmedLine = line.trim();
                         if (trimmedLine) {
-                            let xPos = settings.sideMargin;
+                            let xPosInner = settings.sideMargin;
                             if (settings.textAlignment === 'center') {
-                                xPos = pageWidth / 2;
-                                doc.text(trimmedLine, xPos, yPosition, { align: 'center' });
+                                xPosInner = pageWidth / 2;
+                                doc.text(trimmedLine, xPosInner, yPosition, { align: 'center' });
                             } else if (settings.textAlignment === 'right') {
-                                xPos = pageWidth - settings.sideMargin;
-                                doc.text(trimmedLine, xPos, yPosition, { align: 'right' });
+                                xPosInner = pageWidth - settings.sideMargin;
+                                doc.text(trimmedLine, xPosInner, yPosition, { align: 'right' });
                             } else if (settings.textAlignment === 'justify' && lineIndex < summaryLines.length - 1) {
-                                addJustifiedText(doc, trimmedLine, xPos, yPosition, maxWidth, settings.fontSize);
+                                addJustifiedText(doc, trimmedLine, xPosInner, yPosition, maxWidth, settings.fontSize);
                             } else {
-                                doc.text(trimmedLine, xPos, yPosition);
+                                doc.text(trimmedLine, xPosInner, yPosition);
                             }
                         }
                         yPosition += lineHeight;
@@ -1060,17 +1068,17 @@ This converter automatically formats your text and provides live preview." aria-
                     }
                     const trimmedLine = line.trim();
                     if (trimmedLine) {
-                        let xPos = settings.sideMargin;
+                        let xPosInner = settings.sideMargin;
                         if (settings.textAlignment === 'center') {
-                            xPos = pageWidth / 2;
-                            doc.text(trimmedLine, xPos, yPosition, { align: 'center' });
+                            xPosInner = pageWidth / 2;
+                            doc.text(trimmedLine, xPosInner, yPosition, { align: 'center' });
                         } else if (settings.textAlignment === 'right') {
-                            xPos = pageWidth - settings.sideMargin;
-                            doc.text(trimmedLine, xPos, yPosition, { align: 'right' });
+                            xPosInner = pageWidth - settings.sideMargin;
+                            doc.text(trimmedLine, xPosInner, yPosition, { align: 'right' });
                         } else if (settings.textAlignment === 'justify' && lineIndex < lines.length - 1) {
-                            addJustifiedText(doc, trimmedLine, xPos, yPosition, maxWidth, settings.fontSize);
+                            addJustifiedText(doc, trimmedLine, xPosInner, yPosition, maxWidth, settings.fontSize);
                         } else {
-                            doc.text(trimmedLine, xPos, yPosition);
+                            doc.text(trimmedLine, xPosInner, yPosition);
                         }
                     }
                     yPosition += lineHeight;
@@ -1096,7 +1104,7 @@ This converter automatically formats your text and provides live preview." aria-
 
         function updateStats() {
             const text = textInput.value;
-            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            const words = text.trim() === '' ? 0 : text.trim().split(/\\s+/).length;
             const chars = text.length;
             wordCount.textContent = words.toLocaleString();
             charCount.textContent = chars.toLocaleString();
@@ -1282,7 +1290,7 @@ This converter automatically formats your text and provides live preview." aria-
                 const doc = createPDFDocument(text, settings);
                 const timestamp = new Date().toISOString().slice(0, 10);
                 const filename = settings.docTitle ?
-                    settings.docTitle.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_') + '.pdf' :
+                    settings.docTitle.replace(/[^a-zA-Z0-9\\s]/g, '').trim().replace(/\\s+/g, '_') + '.pdf' :
                     'document_' + timestamp + '.pdf';
 
                 doc.save(filename);
