@@ -732,9 +732,12 @@ This converter automatically formats your text and provides live preview."></tex
         }
 
         /* -------- Mobile helpers -------- */
-        function isMobile() {
-            return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-        }
+        // function isMobile() {
+        //     return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        // }
+         function isMobile() {
+               return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent);
+               }
 
         async function renderPdfWithPdfJs(blobUrl) {
             const container = document.getElementById('pdfJsViewer');
