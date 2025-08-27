@@ -413,6 +413,10 @@ This converter automatically formats your text and provides live preview."></tex
                         <input type="checkbox" id="enableLivePreview" checked>
                         <label for="enableLivePreview">Enable live preview</label>
                     </div>
+                     <div class="checkbox-option">
+                        <input type="checkbox" id="forceMobilePreview" onchange="forceMobileView=this.checked; schedulePreviewUpdate();">
+                        <label for="forceMobilePreview">Force mobile preview</label>
+                     </div>
                 </div>
 
                 <div class="preview-settings" id="previewSettings">
@@ -735,9 +739,13 @@ This converter automatically formats your text and provides live preview."></tex
         // function isMobile() {
         //     return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
         // }
+         let forceMobileView = false;
+
          function isMobile() {
-               return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent);
-               }
+            if (forceMobileView) return true;
+            return /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(navigator.userAgent);
+         }
+
 
         async function renderPdfWithPdfJs(blobUrl) {
             const container = document.getElementById('pdfJsViewer');
